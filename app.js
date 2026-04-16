@@ -54,7 +54,7 @@ app.use(function(err, req, res, next) {
  // Importa o objeto 'sequelize' para conexão com o banco de dados
 const sequelize = require('./config/database');
 // Importa o modelo User para sincronização
-const user = require('./modules/user/userModel.js');
+const user = require('./module/user/userModel.js');
 // Sincroniza o modelo com o banco de dados
 sequelize.sync({alter: true})
   .then(() => console.log('Banco de dados Sincronizado!'))

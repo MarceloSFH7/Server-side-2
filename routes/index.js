@@ -1,7 +1,8 @@
 var express = require ('express');
 var router = express.Router();
 const userController = require('../module/user/userController');
-const upload = require('../middlewares/multer');
+const upload = require('../middleware/multer');
+const authMiddleware = require('../middleware/auth');
 
 // Rota para a pagina inicial
 router.get('/',function(req, res, next){
