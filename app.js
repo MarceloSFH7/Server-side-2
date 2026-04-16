@@ -3,6 +3,8 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const session = require('express-session');
+const flash = require('connect-flash');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -16,6 +18,17 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'Eu adoro paçoca!',   // mude isso!
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 dia
+}));
+app.use(flash());
+app.use((req, res, next) => { 
+  res.locals.messages = req.flash();
+  next();
+});
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -38,10 +51,13 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-// --- Teste de conexão com o banco de dados usando Sequelize ---
-const sequelize = require('./config/database'); 
-sequelize.authenticate()
-   .then(() => console.log('Conexão com MySQL OK!'))
-   .catch(err => console.error('Erro na conexão:', err));
+ // Importa o objeto 'sequelize' para conexão com o banco de dados
+const sequelize = require('./config/database');
+// Importa o modelo User para sincronização
+const user = require('./modules/user/userModel.js');
+// Sincroniza o modelo com o banco de dados
+sequelize.sync({alter: true})
+  .then(() => console.log('Banco de dados Sincronizado!'))
+  .catch(err => console.error('Erro ao sincronizar banco:', err));
 
 module.exports = app;   // <------ última linha do arquivo app.js 
